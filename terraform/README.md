@@ -1,56 +1,25 @@
 
-🧼 Pour le rendre exécutable
+# ✅ Installer la version par défaut (1.12.0)
 
-chmod +x generate-cloudinit-isos.sh
-
-
-
-
-✅ Utilisation : Exemple avec paramètres personnalisés :
-
-
-./generate-cloudinit-isos.sh --vms labvm1 labvm2 --password 'TonSuperMotDePasse' --username ubuntu
-
-
-# Exemple sans paramètre (valeurs par défaut) :
-
-./generate-cloudinit-isos.sh
-
-
-
-🔧 Utilisation :
-✅ Installer la version par défaut (1.12.0)
+# 🧼 Pour le rendre exécutable
 
 chmod +x install_terraform.sh
+
+# ✅ Installer la version par défaut (1.12.0)
 
 ./install_terraform.sh
 
 
-✅ Installer une autre version (ex. 1.13.0)
+# ✅ Installer une autre version (ex. 1.13.0)
 
 ./install_terraform.sh 1.13.0
 
 
 
 
-
-
-
-
-
-
+# List all pools
 
 virsh pool-list --all
-Pour supprimer le pool default si tu veux le recréer :
-
-virsh pool-destroy default
-virsh pool-undefine default
-
-virsh pool-destroy mypool
-virsh pool-undefine mypool
-
-
-
 
 virsh pool-define-as --name vms_dir --type dir --target /home/hichem/vms
 virsh pool-build vms_dir 
@@ -70,14 +39,6 @@ virsh pool-list --all
 
 
 ## ###################################################################
-
-
-
-# Crée un dossier temporaire :
-
-mkdir -p /tmp/cloud-init
-
-Crée un fichier user-data :
 
 
 # /tmp/cloud-init/user-data
@@ -111,9 +72,8 @@ mkpasswd --method=sha-512
 
 
 
-
+# Virsh Net
 virsh net-list --all
-
 
 sudo virsh net-define /usr/share/libvirt/networks/default.xml
 sudo virsh net-autostart default
