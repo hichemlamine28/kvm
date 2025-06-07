@@ -1,0 +1,46 @@
+---
+- hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars.yml   # Ton fichier chiffré avec vault
+
+  tasks:
+
+    - name: Arrêter la VM si elle est active
+      command: virsh destroy "{{ vm_name_prefix }}-{{ item }}"
+      ignore_errors: true
+      loop: "{{ range(1, (vm_count | int) + 1) | list }}"
+      loop_control:
+        label: "{{ vm_name_prefix }}-{{ item }}"
+
+    - name: Supprimer la définition de la VM
+      command: virsh undefine "{{ vm_name_prefix }}-{{ item }}"
+      ignore_errors: true
+      loop: "{{ range(1, (vm_count | int) + 1) | list }}"
+      loop_control:
+        label: "{{ vm_name_prefix }}-{{ item }}"
+
+    - name: Supprimer le disque qcow2 de la VM
+      file:
+        path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.qcow2"
+        state: absent
+      loop: "{{ range(1, (vm_count | int) + 1) | list }}"
+      loop_control:
+        label: "{{ vm_name_prefix }}-{{ item }}"
+
+    - name: Supprimer le fichier XML de définition de la VM
+      file:
+        path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
+        state: absent
+      loop: "{{ range(1, (vm_count | int) + 1) | list }}"
+      loop_control:
+        label: "{{ vm_name_prefix }}-{{ item }}"
+
+    - name: Supprimer tous les fichiers user-data, meta-data et iso dans {{ vm_dir }}
+      file:
+        path: "{{ item }}"
+        state: absent
+      with_fileglob:
+        - "{{ vm_dir }}/*user-data"
+        - "{{ vm_dir }}/*meta-data"
+        - "{{ vm_dir }}/*.iso"

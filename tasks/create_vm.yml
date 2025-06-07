@@ -1,0 +1,86 @@
+---
+- name: Nettoyer VM existante (shutdown, undefine, supprime fichiers)
+  shell: |
+    if virsh dominfo {{ vm_name_prefix }}-{{ item }} &>/dev/null; then
+      virsh destroy {{ vm_name_prefix }}-{{ item }} || true
+      virsh undefine {{ vm_name_prefix }}-{{ item }} || true
+    fi
+
+- file:
+    path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.qcow2"
+    state: absent
+
+- file:
+    path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-user-data"
+    state: absent
+
+- file:
+    path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-meta-data"
+    state: absent
+
+- file:
+    path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-cidata.iso"
+    state: absent
+
+- file:
+    path: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
+    state: absent
+
+- name: Générer fichier user-data
+  template:
+    src: cloudinit/user-data.j2
+    dest: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-user-data"
+  vars:
+    user_name: "{{ vm_user }}"
+    ssh_key: "{{ ssh_public_key }}"
+    password_hash: "{{ vm_password_hash }}"
+
+- name: Générer fichier meta-data
+  copy:
+    dest: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-meta-data"
+    content: |
+      instance-id: {{ vm_name_prefix }}-{{ item }}
+      local-hostname: {{ vm_name_prefix }}-{{ item }}
+  # loop: "{{ range(1, (vm_count | int) + 1) | list }}"
+
+- name: Créer ISO cloud-init
+  command:
+    cmd: >
+      cloud-localds {{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-cidata.iso
+      {{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-user-data
+      {{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}-meta-data
+
+- name: Créer disque qcow2 (différentiel)
+  command:
+    cmd: >
+      qemu-img create -f qcow2 -F qcow2 -b {{ vm_image_path }}
+      {{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.qcow2 {{ vm_disk_size }}
+
+# - name: Générer fichier XML
+#   template:
+#     src: templates/vm_template.xml.j2
+#     dest: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
+#   vars:
+#     vm_name_prefix: "{{ vm_name_prefix }}"
+#     vm_memory: "{{ vm_memory }}"
+#     vm_vcpus: "{{ vm_vcpus }}"
+#     vm_network: "{{ vm_network }}"
+
+
+- name: Générer fichier XML
+  template:
+    src: "templates/vm_template.xml.j2"
+    dest: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
+  # vars:
+  #   # Tu peux laisser d'autres vars si besoin
+  #   vm_memory: "{{ vm_memory }}"
+  #   vm_vcpus: "{{ vm_vcpus }}"
+  #   vm_dir: "{{ vm_dir }}"
+  #   vm_network: "{{ vm_network }}"
+
+- name: Définir la VM
+  command: virsh define --file "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
+  ignore_errors: true
+
+- name: Démarrer la VM
+  command: virsh start "{{ vm_name_prefix }}-{{ item }}"

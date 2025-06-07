@@ -1,0 +1,14 @@
+#cloud-config
+users:
+  - name: {{ user_name }}
+    gecos: Ubuntu User
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: false
+    passwd: "{{ password_hash }}"
+    ssh_authorized_keys:
+      - "{{ ssh_key }}"
+chpasswd:
+  expire: false
+ssh_pwauth: true
+disable_root: false

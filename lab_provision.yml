@@ -1,0 +1,27 @@
+- hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Créer dossier VM si non existant
+      file:
+        path: "{{ vm_dir }}"
+        state: directory
+
+    - name: Télécharger l'image de base Ubuntu focal si absente
+      get_url:
+        url: "{{ vm_image_url }}"
+        dest: "{{ vm_image_path }}"
+        mode: '0644'
+      when: not lookup('file', vm_image_path, errors='ignore')
+
+    - name: Hasher le mot de passe
+      set_fact:
+        vm_password_hash: "{{ vm_password | password_hash('sha512') }}"
+
+    - name: Provisionner chaque VM
+      include_tasks: tasks/create_vm.yml
+      loop: "{{ range(1, (vm_count | int) + 1) | list }}"
+      loop_control:
+        loop_var: item
