@@ -41,6 +41,6 @@
         path: "{{ item }}"
         state: absent
       with_fileglob:
-        - "{{ vm_dir }}/*user-data"
-        - "{{ vm_dir }}/*meta-data"
-        - "{{ vm_dir }}/*.iso"
+        - "{{ vm_dir }}/labvm-*user-data"
+        - "{{ vm_dir }}/labvm-*meta-data"
+        - "{{ vm_dir }}/labvm-*.iso"
