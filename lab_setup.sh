@@ -35,11 +35,13 @@ else
 fi
 
 
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 pip install ansible
 pip install passlib
 ansible-galaxy collection install community.libvirt
+sudo apt install pkg-config libvirt-dev python3-dev -y
+pip3 install libvirt-python
 
 
 

@@ -50,19 +50,11 @@ ansible-playbook lab_provision.yml -e "vm_count=3" --ask-vault-pass
 chmod +x dynamic_inventory.py
 
 # Utiliser avec Ansible :
-
-./inventory_dynamic.py --count 3 --prefix labvm
-
-
-# Tu peux dans ton ansible.cfg ou en ligne de commande appeler cet inventaire dynamique :
-
-ansible -i ./inventory_dynamic.py all -m ping
-
-
+# Dans ton ansible.cfg ou en ligne de commande possible d'appeler cet inventaire dynamique :
 
 ./inventory_dynamic.py
 
-Utilise-le comme inventaire dans ansible :
+# Utiliser le comme inventaire dans ansible :
 
 ansible -i ./inventory_dynamic.py all -m ping
 
@@ -76,7 +68,7 @@ Par défaut (2 VMs nommées labvm) :
 ansible-playbook lab_destroy.yml --ask-vault-pass
 
 
-Avec les mêmes options personnalisées que le provisionnement (ex : devvm × 3) :
+Avec les mêmes options personnalisées que le provisionnement (ex : vm × 3) :
 
 ansible-playbook lab_destroy.yml -e "vm_count=3" --ask-vault-pass
 

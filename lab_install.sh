@@ -20,5 +20,5 @@ Sur une distribution basée sur RHEL/Fedora :
 ansible-galaxy collection install community.libvirt
 
 pip install passlib
-sudo apt install pkg-config libvirt-dev python3-dev
+sudo apt install pkg-config libvirt-dev python3-dev -y
 pip3 install libvirt-python
