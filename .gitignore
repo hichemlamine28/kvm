@@ -3,4 +3,4 @@ ansible/venv
 terraform/.terraform
 terraform/.terraform.tfstate
 terraform/.terraform.lock.hcl;
-terrform/terraform.tfstate.backup
+terraform/terraform.tfstate.backup
