@@ -1,7 +1,7 @@
 
-# ✅ Installer la version par défaut (1.12.0)
+# ✅ Installer Terraform - par défaut (1.12.0)
 
-# 🧼 Pour le rendre exécutable
+# 🧼 Rendre exécutable
 
 chmod +x install_terraform.sh
 
@@ -13,7 +13,6 @@ chmod +x install_terraform.sh
 # ✅ Installer une autre version (ex. 1.13.0)
 
 ./install_terraform.sh 1.13.0
-
 
 
 
@@ -66,9 +65,6 @@ ou bien
 
 sudo apt-get install -y whois
 mkpasswd --method=sha-512
-
-
-
 
 
 
