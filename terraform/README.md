@@ -40,7 +40,7 @@ virsh pool-list --all
 ## ###################################################################
 
 
-# /tmp/cloud-init/user-data
+# cloud-init/user-data
 #cloud-config
 users:
   - name: ubuntu
