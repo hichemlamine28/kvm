@@ -16,31 +16,45 @@ chmod +x install_terraform.sh
 
 
 
-# List all pools
+# 🧱 Étape 1 : Préparation de Vault  : Assure-toi que Vault est bien installé et lancé :
 
-virsh pool-list --all
+vault server -dev
 
-virsh pool-define-as --name vms_dir --type dir --target /home/hichem/vms
-virsh pool-build vms_dir 
-virsh pool-start vms_dir 
-virsh pool-autostart vms_dir 
-
-virsh pool-list --all
+(mode dev à usage local/test, sinon utilise un cluster Vault sécurisé)
 
 
-## ###################################################################
+# Exporte l'adresse Vault :
 
-virsh pool-define-as vms_dir dir --target /home/hichem/vms
-virsh pool-build vms_dir
-virsh pool-start vms_dir
-virsh pool-autostart vms_dir
-virsh pool-list --all
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN='root_token'   # en dev, le token est affiché au démarrage
 
 
-## ###################################################################
+
+Ajoute le secret (ex : mot de passe déjà hashé SHA-512) :
+
+exemple:
+vault kv put secret/labvm user_password_hashed='$6$CPBD7PJYoXowkski$DvEZej04o2PlZ6ONGxb6hQbOSxejP6u1iHswucqNMt1BPnuqURCJ60CchqO.Lek6/nKL4l5rmw1MY/zfhEhKd0'
+
+
+export VAULT_TOKEN=$(vault print token)
+export TF_VAR_vault_token=$(vault print token)
+
+vault kv get secret/labvm
+
+
+
+# Comment lire le mot de passe crypté via vault ou depuis tfvars: 
+passwd: ${local.user_password_hashed}                 # il faut declarer locals
+
+passwd: '${data.vault_kv_secret_v2.user_password.data["user_password_hashed"]}'  # sans locals
+
+ ( or just put this if no vault :::  )
+
+passwd: ${var.user_password_hashed}  
 
 
 # cloud-init/user-data
+
 #cloud-config
 users:
   - name: ubuntu
@@ -66,6 +80,23 @@ ou bien
 sudo apt-get install -y whois
 mkpasswd --method=sha-512
 
+
+# List all pools
+
+virsh pool-list --all
+
+virsh pool-define-as --name vms_dir --type dir --target /home/hichem/vms
+
+virsh pool-define-as vms_dir dir --target /home/hichem/vms
+
+virsh pool-build vms_dir
+virsh pool-start vms_dir
+virsh pool-autostart vms_dir
+
+virsh pool-list --all
+
+virsh pool-destroy vms_dir
+virsh pool-undefine vms_dir
 
 
 # Virsh Net

@@ -1,5 +1,9 @@
 terraform {
   required_providers {
+    vault = {
+      source  = "hashicorp/vault"
+      version = "~> 3.0"
+    }
     libvirt = {
       source  = "dmacvicar/libvirt"
       version = "~> 0.8.3"
@@ -11,6 +15,13 @@ provider "libvirt" {
   uri = "qemu:///system"
 }
 
+
+provider "vault" {
+  address = "http://127.0.0.1:8200" # adapte si besoin
+  skip_tls_verify = true
+  # Le token sera pris automatiquement depuis VAULT_TOKEN dans l'environnement si vous avez deja fait export
+  token   = var.vault_token
+}
 
 resource "null_resource" "activate_pool" {
   provisioner "local-exec" {
@@ -38,7 +49,7 @@ resource "libvirt_pool" "vms_dir" {
 
 resource "libvirt_volume" "system" {
   count  = var.vm_count
-  name   = "${var.user_name}${count.index + 1}-system.qcow2"
+  name   = "${var.host_name}${count.index + 1}-system.qcow2"
   pool   = libvirt_pool.vms_dir.name
   source = "/home/hichem/vms/ubuntu-focal-base.qcow2"
   format = "qcow2"
@@ -49,14 +60,14 @@ data "template_file" "user_data" {
   template = <<-EOT
     #cloud-config
     users:
-      - name: "ubuntu"              # ${var.user_name}${count.index}
+      - name: "ubuntu"              # ${var.host_name}${count.index}
         ssh-authorized-keys:
           - ${var.ssh_pub_key}
         sudo: ['ALL=(ALL) NOPASSWD:ALL']
         groups: sudo
         shell: /bin/bash
         lock_passwd: false
-        passwd: ${var.user_password_hashed}
+        passwd: '${data.vault_kv_secret_v2.user_password.data["user_password_hashed"]}'
     disable_root: true
     ssh_pwauth: true
   EOT
@@ -65,14 +76,14 @@ data "template_file" "user_data" {
 data "template_file" "meta_data" {
   count    = var.vm_count
   template = <<-EOT
-    instance-id: ${var.user_name}${count.index + 1}
-    local-hostname: ${var.user_name}${count.index + 1}
+    instance-id: ${var.host_name}${count.index + 1}
+    local-hostname: ${var.host_name}${count.index + 1}
   EOT
 }
 
 resource "libvirt_cloudinit_disk" "commoninit" {
   count     = var.vm_count
-  name      = "${var.user_name}${count.index +1}-cloudinit.iso"
+  name      = "${var.host_name}${count.index +1}-cloudinit.iso"
   pool      = libvirt_pool.vms_dir.name
   user_data = data.template_file.user_data[count.index].rendered
   meta_data = data.template_file.meta_data[count.index].rendered
@@ -80,7 +91,7 @@ resource "libvirt_cloudinit_disk" "commoninit" {
 
 resource "libvirt_domain" "vm" {
   count  = var.vm_count
-  name   = "${var.user_name}${count.index + 1}"
+  name   = "${var.host_name}${count.index + 1}"
   memory = 2048
   vcpu   = 2
 
@@ -92,7 +103,7 @@ resource "libvirt_domain" "vm" {
 
   network_interface {
     network_name = "default"
-    hostname     = "${var.user_name}${count.index + 1}"
+    hostname     = "${var.host_name}${count.index + 1}"
   }
 
   console {
@@ -104,4 +115,15 @@ resource "libvirt_domain" "vm" {
   graphics {
     type = "spice"
   }
+}
+
+# Lire depuis Vault
+data "vault_kv_secret_v2" "user_password" {
+  mount = "secret"
+  name = "labvm"
+  # path = "secret"
+}
+
+locals {
+  user_password_hashed = data.vault_kv_secret_v2.user_password.data["user_password_hashed"]
 }
