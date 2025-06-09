@@ -1,107 +1,183 @@
+# 🚀 Provisionnement de VMs avec Terraform + KVM/QEMU/Libvirt
 
-# ✅ Installer Terraform - par défaut (1.12.0)
+Ce guide décrit l'installation de Terraform, la configuration de Vault, la génération d'images cloud-init, et la gestion des pools & réseaux `virsh` pour créer des VMs locales avec Terraform.
 
-# 🧼 Rendre exécutable
+---
 
+## ✅ Installation de Terraform
+
+### 🔧 Rendre le script d’installation exécutable
+
+```bash
 chmod +x install_terraform.sh
+```
 
-# ✅ Installer la version par défaut (1.12.0)
+### 📦 Installer la version par défaut (1.12.0)
 
+```bash
 ./install_terraform.sh
+```
 
+### 🔁 Installer une autre version de Terraform (ex. : 1.13.0)
 
-# ✅ Installer une autre version (ex. 1.13.0)
-
+```bash
 ./install_terraform.sh 1.13.0
+```
 
+---
 
+## 🔐 Génération de mot de passe hashé (SHA-512)
 
-# 🧱 Étape 1 : Préparation de Vault  : Assure-toi que Vault est bien installé et lancé :
+### 📜 Avec Python
 
+```bash
+python3 -c "import crypt; print(crypt.crypt('devops', crypt.mksalt(crypt.METHOD_SHA512)))"
+```
+
+### 📦 Avec `whois` / `mkpasswd`
+
+```bash
+sudo apt-get install -y whois
+mkpasswd --method=sha-512
+```
+
+---
+
+## 🧱 Étape 1 : Configuration de Vault
+
+### 🔐 Lancer Vault en mode développement (usage local/test uniquement)
+
+```bash
 vault server -dev
+```
 
-(mode dev à usage local/test, sinon utilise un cluster Vault sécurisé)
+> Pour une utilisation en production, il est recommandé d’utiliser un cluster Vault sécurisé.
 
+### 🌍 Exporter les variables d’environnement nécessaires
 
-# Exporte l'adresse Vault :
-
+```bash
 export VAULT_ADDR='http://127.0.0.1:8200'
-export VAULT_TOKEN='root_token'   # en dev, le token est affiché au démarrage
+export VAULT_TOKEN='root_token'  # (le token est affiché lors du démarrage de Vault en mode dev)
+```
 
+### 🔑 Ajouter un secret dans Vault (ex. : mot de passe hashé SHA-512)
 
-
-Ajoute le secret (ex : mot de passe déjà hashé SHA-512) :
-
-exemple:
+```bash
 vault kv put secret/labvm user_password_hashed='$6$CPBD7PJYoXowkski$DvEZej04o2PlZ6ONGxb6hQbOSxejP6u1iHswucqNMt1BPnuqURCJ60CchqO.Lek6/nKL4l5rmw1MY/zfhEhKd0'
+```
 
+### 🔄 Exporter le token pour Terraform
 
+```bash
 export VAULT_TOKEN=$(vault print token)
 export TF_VAR_vault_token=$(vault print token)
+```
 
+### 🔍 Vérifier la présence du secret
+
+```bash
 vault kv get secret/labvm
+```
 
+---
 
+## 🔎 Lecture du mot de passe dans Terraform
 
-# Comment lire le mot de passe crypté via vault ou depuis tfvars: 
-passwd: ${local.user_password_hashed}                 # il faut declarer locals
+Différentes façons d'utiliser le mot de passe dans Terraform :
 
-passwd: '${data.vault_kv_secret_v2.user_password.data["user_password_hashed"]}'  # sans locals
+```hcl
+# Avec local :
+passwd: ${local.user_password_hashed}
 
- ( or just put this if no vault :::  )
+# Avec data source Vault :
+passwd: '${data.vault_kv_secret_v2.user_password.data["user_password_hashed"]}'
 
-passwd: ${var.user_password_hashed}  
+# Sans Vault :
+passwd: ${var.user_password_hashed}
+```
 
+---
 
-# cloud-init/user-data
+## ⚙️ cloud-init : Configuration utilisateur
 
-#cloud-config
+Fichier `cloud-init/user-data` :
+
+<pre><code>##cloud-config
 users:
   - name: ubuntu
     ssh-authorized-keys:
       - ssh-rsa AAAA...ton_clef_publique...
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
+</code></pre>
 
-# Crée un fichier meta-data vide :
+### 📄 Créer un fichier `meta-data` vide
 
+```bash
 touch cloud-init/meta-data
+```
 
-# Génère l’ISO cloud-init :
+### 📀 Générer un ISO cloud-init
 
+```bash
 genisoimage -output /home/hichem/vms/cloud-init.iso -volid cidata -joliet -rock cloud-init/user-data cloud-init/meta-data
+```
 
+---
 
-# Pour crypter / hasher le password 
-python3 -c "import crypt; print(crypt.crypt('devops', crypt.mksalt(crypt.METHOD_SHA512)))"
+## 🗂️ Gestion des pools de stockage avec `virsh`
 
-ou bien
+### 🔍 Lister tous les pools
 
-sudo apt-get install -y whois
-mkpasswd --method=sha-512
-
-
-# List all pools
-
+```bash
 virsh pool-list --all
+```
 
+### 📁 Créer un nouveau pool nommé `vms_dir`
+
+```bash
 virsh pool-define-as --name vms_dir --type dir --target /home/hichem/vms
+```
 
+OU :
+
+```bash
 virsh pool-define-as vms_dir dir --target /home/hichem/vms
+```
 
+### ▶️ Initialiser et activer le pool
+
+```bash
 virsh pool-build vms_dir
 virsh pool-start vms_dir
 virsh pool-autostart vms_dir
+```
 
-virsh pool-list --all
+### 🧹 Supprimer le pool
 
+```bash
 virsh pool-destroy vms_dir
 virsh pool-undefine vms_dir
+```
 
+---
 
-# Virsh Net
+## 🌐 Gestion du réseau avec `virsh`
+
+### 🔍 Lister les réseaux disponibles
+
+```bash
 virsh net-list --all
+```
 
+### 🌐 Définir et démarrer le réseau `default`
+
+```bash
 sudo virsh net-define /usr/share/libvirt/networks/default.xml
 sudo virsh net-autostart default
 sudo virsh net-start default
+```
+
+---
+
+> ✅ Tous les outils sont maintenant prêts pour exécuter vos plans Terraform avec KVM/libvirt et Vault.
