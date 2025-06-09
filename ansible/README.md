@@ -1,5 +1,13 @@
 #  🚀 🧪 Lab Virtualisé KVM avec Ansible + KVM/QEMU/Libvirt
 
+[![GitHub repo size](https://img.shields.io/github/repo-size/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm)
+[![GitHub issues](https://img.shields.io/github/issues/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm/issues)
+[![GitHub forks](https://img.shields.io/github/forks/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm/network)
+[![GitHub stars](https://img.shields.io/github/stars/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm/stargazers)
+[![GitHub license](https://img.shields.io/github/license/hichemlamine28/kvm?style=flat-square)](LICENSE)
+
+
+
 ![Ansible](https://img.shields.io/badge/Ansible-Automation-EE0000?logo=ansible)
 ![KVM](https://img.shields.io/badge/KVM-ready-6600cc?logo=linux)
 ![License](https://img.shields.io/badge/license-MIT-blue)

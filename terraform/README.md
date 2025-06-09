@@ -1,5 +1,12 @@
 #  🚀 🧪 Lab Virtualisé KVM avec Terraform + KVM/QEMU/Libvirt
 
+[![GitHub repo size](https://img.shields.io/github/repo-size/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm)
+[![GitHub issues](https://img.shields.io/github/issues/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm/issues)
+[![GitHub forks](https://img.shields.io/github/forks/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm/network)
+[![GitHub stars](https://img.shields.io/github/stars/hichemlamine28/kvm?style=flat-square)](https://github.com/hichemlamine28/kvm/stargazers)
+[![GitHub license](https://img.shields.io/github/license/hichemlamine28/kvm?style=flat-square)](LICENSE)
+
+
 ![Terraform](https://img.shields.io/badge/Terraform-1.12.0-5F43E9?logo=terraform)
 ![KVM](https://img.shields.io/badge/KVM-integrated-6600cc?logo=linux)
 ![License](https://img.shields.io/badge/license-MIT-blue)
