@@ -1,4 +1,10 @@
-# 🚀 Provisionnement de VMs avec Terraform + KVM/QEMU/Libvirt
+#  🚀 🧪 Lab Virtualisé KVM avec Terraform + KVM/QEMU/Libvirt
+
+![Terraform](https://img.shields.io/badge/Terraform-1.12.0-5F43E9?logo=terraform)
+![KVM](https://img.shields.io/badge/KVM-integrated-6600cc?logo=linux)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+---
 
 Ce guide décrit l'installation de Terraform, la configuration de Vault, la génération d'images cloud-init, et la gestion des pools & réseaux `virsh` pour créer des VMs locales avec Terraform.
 
