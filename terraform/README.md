@@ -31,7 +31,7 @@ chmod +x install_terraform.sh
 ### 📜 Avec Python
 
 ```bash
-python3 -c "import crypt; print(crypt.crypt('devops', crypt.mksalt(crypt.METHOD_SHA512)))"
+python3 -c "import crypt; print(crypt.crypt('you-password-here', crypt.mksalt(crypt.METHOD_SHA512)))"
 ```
 
 ### 📦 Avec `whois` / `mkpasswd`
@@ -63,7 +63,7 @@ export VAULT_TOKEN='root_token'  # (le token est affiché lors du démarrage de 
 ### 🔑 Ajouter un secret dans Vault (ex. : mot de passe hashé SHA-512)
 
 ```bash
-vault kv put secret/labvm user_password_hashed='$6$CPBD7PJYoXowkski$DvEZej04o2PlZ6ONGxb6hQbOSxejP6u1iHswucqNMt1BPnuqURCJ60CchqO.Lek6/nKL4l5rmw1MY/zfhEhKd0'
+vault kv put secret/labvm user_password_hashed='$6$CPBD7PJYoXowkski$.......O.Lek6/nKL4l5rmw1MY/zf...Kd0'
 ```
 
 ### 🔄 Exporter le token pour Terraform
