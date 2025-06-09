@@ -9,7 +9,7 @@
         path: "{{ vm_dir }}"
         state: directory
 
-    - name: Télécharger l'image de base Ubuntu focal si absente
+    - name: Télécharger l'image de base Ubuntu noble si absente
       get_url:
         url: "{{ vm_image_url }}"
         dest: "{{ vm_image_path }}"

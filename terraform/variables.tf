@@ -40,5 +40,5 @@ variable "base_path" {
 
 variable "source_image" {
   type    = string
-  default = "ubuntu-focal-base.qcow2"
+  default = "ubuntu-noble-base.qcow2"
 }

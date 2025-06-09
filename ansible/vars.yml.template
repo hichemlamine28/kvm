@@ -5,8 +5,10 @@ vm_memory: 1024        # en Mo
 vm_vcpus: 1
 vm_disk_size: 10G
 vm_network: default
-vm_image_url: "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img"
-vm_image_path: "{{ lookup('env','HOME') }}/vms/ubuntu-focal-base.qcow2"
+#vm_image_url: "https://cloud-images.ubuntu.com/focal/current/focal-server-cloudimg-amd64.img"
+#vm_image_path: "{{ lookup('env','HOME') }}/vms/ubuntu-focal-base.qcow2"
+vm_image_url: "https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img"
+vm_image_path: "{{ lookup('env','HOME') }}/vms/ubuntu-noble-base.qcow2"
 vm_storage_path: "{{ lookup('env','HOME') }}/vms"
 vm_dir: "{{ lookup('env','HOME') }}/vms"
 ssh_public_key: "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"

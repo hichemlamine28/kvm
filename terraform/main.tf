@@ -37,61 +37,29 @@ resource "null_resource" "activate_pool" {
   depends_on = [libvirt_pool.vms_dir]
 }
 
-
-# Copie et resize de l’image avant attachement
-resource "null_resource" "resized_image" {
-  count = var.vm_count
-
-  triggers = {
-    index       = count.index
-    resized_img = "${var.base_path}/${var.host_name}${count.index + 1}-resized.qcow2"
-    size_gb     = var.disk_size_gb
-  }
-
-  provisioner "local-exec" {
-    command = <<EOT
-      cp ${var.base_path}/${var.source_image} ${self.triggers.resized_img}
-      qemu-img resize ${self.triggers.resized_img} ${self.triggers.size_gb}G
-    EOT
-  }
-}
-
-resource "libvirt_volume" "system" {
-  count  = var.vm_count
-  name   = "${var.host_name}${count.index + 1}-system.qcow2"
-  pool   = libvirt_pool.vms_dir.name
-  source = null_resource.resized_image[count.index].triggers.resized_img
-  format = "qcow2"
-}
-
-
-
 resource "libvirt_pool" "vms_dir" {
   name = "vms_dir"
   type = "dir"
   target {
-    path = "/home/hichem/vms"
+    path = var.base_path
   }
-
 }
 
-# data "template_file" "user_data" {
-#   count    = var.vm_count
-#   template = <<-EOT
-#     #cloud-config
-#     users:
-#       - name: "ubuntu"              # ${var.host_name}${count.index}
-#         ssh-authorized-keys:
-#           - ${var.ssh_pub_key}
-#         sudo: ['ALL=(ALL) NOPASSWD:ALL']
-#         groups: sudo
-#         shell: /bin/bash
-#         lock_passwd: false
-#         passwd: '${data.vault_kv_secret_v2.user_password.data["user_password_hashed"]}'
-#     disable_root: true
-#     ssh_pwauth: true
-#   EOT
-# }
+resource "libvirt_volume" "base" {
+  name   = "ubuntu-noble-base"
+  pool   = libvirt_pool.vms_dir.name
+  source = "${var.base_path}/${var.source_image}"
+  format = "qcow2"
+}
+
+resource "libvirt_volume" "system" {
+  count          = var.vm_count
+  name           = "${var.host_name}${count.index + 1}-system.qcow2"
+  pool           = libvirt_pool.vms_dir.name
+  base_volume_id = libvirt_volume.base.id
+  size           = var.disk_size_gb * 1024 * 1024 * 1024  # taille en octets
+  format         = "qcow2"
+}
 
 data "template_file" "user_data" {
   count    = var.vm_count
@@ -170,7 +138,6 @@ resource "libvirt_domain" "vm" {
 data "vault_kv_secret_v2" "user_password" {
   mount = "secret"
   name = "labvm"
-  # path = "secret"
 }
 
 locals {
