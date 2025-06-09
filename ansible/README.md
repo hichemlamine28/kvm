@@ -1,5 +1,13 @@
 # 🧪 Lab Virtualisé KVM avec Ansible
 
+# 🧪 Infrastructure KVM avec Ansible
+
+![Ansible](https://img.shields.io/badge/Ansible-Automation-EE0000?logo=ansible)
+![KVM](https://img.shields.io/badge/KVM-ready-6600cc?logo=linux)
+![License](https://img.shields.io/badge/license-MIT-blue)
+
+---
+
 Ce guide permet de provisionner dynamiquement des machines virtuelles via **KVM/QEMU/libvirt**, en utilisant **Ansible** et un inventaire dynamique.
 
 ---
