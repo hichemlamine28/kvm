@@ -27,3 +27,18 @@ variable "vault_token" {
   type      = string
   sensitive = true
 }
+
+variable "disk_size_gb" {
+  type    = number
+  default = 20
+}
+
+variable "base_path" {
+  type    = string
+  default = "/home/hichem/vms"
+}
+
+variable "source_image" {
+  type    = string
+  default = "ubuntu-focal-base.qcow2"
+}
