@@ -1,6 +1,12 @@
-# kvm
+# 🧪 Lab Virtualisé KVM avec Ansible
 
-## #######################
+Ce guide permet de provisionner dynamiquement des machines virtuelles via **KVM/QEMU/libvirt**, en utilisant **Ansible** et un inventaire dynamique.
+
+---
+
+## ⚙️ Pré-requis : Installation des dépendances Python et Libvirt
+
+```bash
 python -m venv venv
 source venv/bin/activate
 pip install ansible
@@ -8,79 +14,81 @@ pip install passlib
 ansible-galaxy collection install community.libvirt
 sudo apt install pkg-config libvirt-dev python3-dev
 pip3 install libvirt-python
+```
 
+---
 
-## #######################
+## 🛠️ Étape 1 : Script d'installation de l'environnement KVM
 
-🛠️ 1. Script d'installation KVM/Linux natif
+Rends le script exécutable et lance-le :
 
+```bash
 chmod +x kvm_lab_setup.sh
-
-
 ./kvm_lab_setup.sh
+```
 
-## #######################
+---
 
+## 🚀 Étape 2 : Provisionnement dynamique de VMs via Ansible
 
-📦 2. Playbook Ansible pour créer dynamiquement N VM
+### ✅ Lancer le playbook de provisionnement
 
+- **Provisionner 2 VMs Ubuntu (par défaut)** :
 
-✅ Provisionner les VMs
-▶️ Par défaut (2 VMs Ubuntu) :
-
-
+```bash
 ansible-playbook lab_provision.yml --ask-vault-pass
+```
 
+- **Provisionnement personnalisé (ex. : 3 VMs nommées `devvm` avec une autre image)** :
 
-Avec options personnalisées (ex : 3 VMs appelées devvm avec une autre image) :
-
+```bash
 ansible-playbook lab_provision.yml -e "vm_count=3" --ask-vault-pass
+```
 
+---
 
+## 📦 Étape 3 : Inventaire dynamique avec libvirt
 
-## ###############################
+### 🔧 Rendre le script d’inventaire exécutable :
 
-
-
-📜 3. Inventaire dynamique Ansible avec libvirt
-
-# Ce script génère un inventaire JSON que tu peux utiliser avec Ansible :
-# Rendre le script python exécutable:
-
+```bash
 chmod +x dynamic_inventory.py
+```
 
-# Utiliser avec Ansible :
-# Dans ton ansible.cfg ou en ligne de commande possible d'appeler cet inventaire dynamique :
+### 📋 Utiliser le script avec Ansible :
 
-./inventory_dynamic.py
-
-# Utiliser le comme inventaire dans ansible :
-
+```bash
 ansible -i ./inventory_dynamic.py all -m ping
+```
 
+💡 Tu peux également référencer ce script directement dans `ansible.cfg`.
 
+---
 
+## 🧨 Étape 4 : Destruction des VMs
 
-🔥 Pour détruire les VMs :
-🗑 Détruire les VMs
-Par défaut (2 VMs nommées labvm) :
+### 🗑 Détruire les VMs créées
 
+- **Par défaut (2 VMs nommées `labvm`)** :
+
+```bash
 ansible-playbook lab_destroy.yml --ask-vault-pass
+```
 
+- **Détruire une configuration personnalisée (ex. : 3 VMs)** :
 
-Avec les mêmes options personnalisées que le provisionnement (ex : vm × 3) :
-
+```bash
 ansible-playbook lab_destroy.yml -e "vm_count=3" --ask-vault-pass
+```
 
+---
 
+## 🧼 Astuce : Nettoyage complet rapide (hors Ansible)
 
+Pour supprimer manuellement toutes les VMs créées dans `~/vms/` :
 
-🧼 Astuce : Nettoyage global rapide
-Si tu veux détruire tout ce qui est dans ~/vms/, tu peux aussi le faire ainsi (si plus rapide que le playbook pour un reset complet) :
-
-
+```bash
 virsh list --all --name | grep '^labvm' | xargs -r -n1 virsh destroy
 virsh list --all --name | grep '^labvm' | xargs -r -n1 virsh undefine
 rm -f ~/vms/labvm*
-
-
+```

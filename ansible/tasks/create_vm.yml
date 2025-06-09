@@ -41,7 +41,6 @@
     content: |
       instance-id: {{ vm_name_prefix }}-{{ item }}
       local-hostname: {{ vm_name_prefix }}-{{ item }}
-  # loop: "{{ range(1, (vm_count | int) + 1) | list }}"
 
 - name: Créer ISO cloud-init
   command:
@@ -56,27 +55,10 @@
       qemu-img create -f qcow2 -F qcow2 -b {{ vm_image_path }}
       {{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.qcow2 {{ vm_disk_size }}
 
-# - name: Générer fichier XML
-#   template:
-#     src: templates/vm_template.xml.j2
-#     dest: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
-#   vars:
-#     vm_name_prefix: "{{ vm_name_prefix }}"
-#     vm_memory: "{{ vm_memory }}"
-#     vm_vcpus: "{{ vm_vcpus }}"
-#     vm_network: "{{ vm_network }}"
-
-
 - name: Générer fichier XML
   template:
     src: "templates/vm_template.xml.j2"
     dest: "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
-  # vars:
-  #   # Tu peux laisser d'autres vars si besoin
-  #   vm_memory: "{{ vm_memory }}"
-  #   vm_vcpus: "{{ vm_vcpus }}"
-  #   vm_dir: "{{ vm_dir }}"
-  #   vm_network: "{{ vm_network }}"
 
 - name: Définir la VM
   command: virsh define --file "{{ vm_dir }}/{{ vm_name_prefix }}-{{ item }}.xml"
