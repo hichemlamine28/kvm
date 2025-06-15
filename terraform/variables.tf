@@ -4,6 +4,18 @@ variable "vm_count" {
   default     = 2
 }
 
+variable "memory_mb" {
+  description = "Mémoire allouée à chaque VM (en Mo)"
+  type        = number
+  default     = 2048
+}
+
+variable "vcpu_count" {
+  description = "Nombre de vCPU alloués à chaque VM"
+  type        = number
+  default     = 2
+}
+
 variable "host_name" {
   description = "Nom de l'utilisateur dans la VM"
   type        = string

@@ -87,6 +87,10 @@ data "template_file" "user_data" {
 
     runcmd:
       - loadkeys fr
+      - modprobe kvm
+      - modprobe kvm_intel nested=1
+      - echo "options kvm_intel nested=1" >> /etc/modprobe.d/kvm-intel.conf
+
   EOT
 }
 
@@ -109,8 +113,12 @@ resource "libvirt_cloudinit_disk" "commoninit" {
 resource "libvirt_domain" "vm" {
   count  = var.vm_count
   name   = "${var.host_name}${count.index + 1}"
-  memory = 2048
-  vcpu   = 2
+  memory = var.memory_mb
+  vcpu   = var.vcpu_count
+
+  cpu {
+    mode  = "host-passthrough"
+  }
 
   disk {
     volume_id = libvirt_volume.system[count.index].id
