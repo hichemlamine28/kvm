@@ -117,7 +117,7 @@ Fichier `cloud-init/user-data` :
 
 <pre><code>##cloud-config
 users:
-  - name: ubuntu
+  - name: hichem
     ssh-authorized-keys:
       - ssh-rsa AAAA...ton_clef_publique...
     sudo: ALL=(ALL) NOPASSWD:ALL
