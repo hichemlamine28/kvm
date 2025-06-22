@@ -194,3 +194,15 @@ sudo virsh net-start default
 ---
 
 > ✅ Tous les outils sont maintenant prêts pour exécuter vos plans Terraform avec KVM/libvirt et Vault.
+
+
+
+
+
+
+
+
+
+
+
+
