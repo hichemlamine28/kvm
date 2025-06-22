@@ -22,7 +22,7 @@ provider "vault" {
   # Le token sera pris automatiquement depuis VAULT_TOKEN dans l'environnement si vous avez deja fait export
   token   = var.vault_token
   #Exemple en dur  , non securisé:
-  #t o k e n   = hvs.   w to colpete here if need test ???????? remove spaces in world please
+  #t o k e n   = hvs.   w to complete here if need test ???????? remove spaces in world please
 }
 
 resource "null_resource" "activate_pool" {
