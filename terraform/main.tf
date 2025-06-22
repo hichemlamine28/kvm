@@ -66,7 +66,7 @@ data "template_file" "user_data" {
   template = <<-EOT
     #cloud-config
     users:
-      - name: "ubuntu"
+      - name: "hichem"
         ssh-authorized-keys:
           - ${var.ssh_pub_key}
         sudo: ['ALL=(ALL) NOPASSWD:ALL']

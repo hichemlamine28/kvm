@@ -55,7 +55,7 @@ def main():
 
         inventory["_meta"]["hostvars"][name] = {
             "ansible_host": ip if ip else "UNKNOWN",
-            "ansible_user": "ubuntu",  # adapter si besoin
+            "ansible_user": "hichem",  # adapter si besoin
             "libvirt_id": id,
             "state": dom.info()[0]  # état de la VM
         }
@@ -74,7 +74,7 @@ def main():
         inventory["all"]["hosts"].append(name)
         inventory["_meta"]["hostvars"][name] = {
             "ansible_host": "OFFLINE",
-            "ansible_user": "ubuntu",
+            "ansible_user": "hichem",
             "libvirt_id": None,
             "state": dom.info()[0]  # état
         }
